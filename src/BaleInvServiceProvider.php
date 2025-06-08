@@ -1,13 +1,19 @@
 <?php
 
-namespace VendorName\Skeleton;
+namespace Paparee\BaleInv;
 
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use VendorName\Skeleton\Commands\SkeletonCommand;
 
-class SkeletonServiceProvider extends PackageServiceProvider
+class BaleInvServiceProvider extends PackageServiceProvider
 {
+    public function boot()
+    {
+        $this->publishes([
+            __DIR__.'/../database/migrations' => base_path('database/migrations'),
+        ], 'bale-inv-migrations');
+    }
+
     public function configurePackage(Package $package): void
     {
         /*
@@ -16,10 +22,9 @@ class SkeletonServiceProvider extends PackageServiceProvider
          * More info: https://github.com/spatie/laravel-package-tools
          */
         $package
-            ->name('skeleton')
+            ->name('bale-inv')
             ->hasConfigFile()
             ->hasViews()
-            ->hasMigration('create_migration_table_name_table')
-            ->hasCommand(SkeletonCommand::class);
+            ->hasMigration('create_bale_inv_table');
     }
 }
