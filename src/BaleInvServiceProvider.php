@@ -16,6 +16,10 @@ class BaleInvServiceProvider extends PackageServiceProvider
         $this->publishes([
             __DIR__.'/../database/migrations/inv' => base_path('database/migrations/inv'),
         ], 'bale-inv-migrations');
+
+        $this->publishes([
+            __DIR__.'/../resources/views/livewire' => resource_path('views/livewire'),
+        ], 'bale-cms-views');
     }
 
     public function configurePackage(Package $package): void
