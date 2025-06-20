@@ -2,16 +2,19 @@
 
 namespace Paparee\BaleInv\App\Models;
 
-use Paparee\BaleInv\App\Traits\HasInventory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class InventoryContract extends Model
+class InventoryAssignmentLog extends Model
 {
     use HasUuids;
-    use HasInventory;
 
     protected $guarded = ['id'];
     protected $connection = 'inv';
 
+    public function assignment(): BelongsTo
+    {
+        return $this->belongsTo(InventoryAssignment::class);
+    }
 }

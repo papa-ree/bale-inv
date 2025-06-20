@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('inventory_contracts', function (Blueprint $table) {
+        Schema::connection('inv')->create('inventory_contracts', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('title');
             $table->string('vendor');
             $table->text('description')->nullable();
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();
-            $table->string('contract_number')->nullable()->unique();
+            $table->string('contract_number')->nullable();
             $table->string('document_path')->nullable(); // file PDF kontrak
             $table->timestamps();
         });
@@ -29,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('inventory_contracts');
+        Schema::connection('inv')->dropIfExists('inventory_contracts');
     }
 };

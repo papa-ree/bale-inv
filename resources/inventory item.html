@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base target="_self">
+  <title>Bale-Inv - Inventory Items</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@preline/preline@2.0.0/dist/preline.min.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              500: '#3b82f6',
+              600: '#2563eb',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    [data-theme-toggle] svg.sun {
+      display: none;
+    }
+    [data-theme-toggle] svg.moon {
+      display: block;
+    }
+    .dark [data-theme-toggle] svg.sun {
+      display: block;
+    }
+    .dark [data-theme-toggle] svg.moon {
+      display: none;
+    }
+    .animate-fade-in {
+      animation: fadeIn 0.3s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors duration-200 min-h-screen">
+  <div class="container mx-auto px-4 py-6">
+    <!-- Header Section -->
+    <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+      <div>
+        <h1 class="text-xl sm:text-2xl font-semibold">Inventory Items</h1>
+        <p class="text-sm text-gray-500 dark:text-gray-400">Manage your inventory items</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <button id="themeToggle" data-theme-toggle class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+          <svg class="sun w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+          <svg class="moon w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+          </svg>
+        </button>
+        <button id="addItemBtn" class="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors shadow-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+          Add Item
+        </button>
+      </div>
+    </header>
+
+    <!-- Filter/Search Section -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 mb-6 animate-fade-in">
+      <div class="flex flex-col md:flex-row gap-4">
+        <div class="flex-1 relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <input type="text" id="searchInput" class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm" placeholder="Search items by name, code, or location">
+        </div>
+        <div class="w-full md:w-48">
+          <select id="categoryFilter" class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm">
+            <option value="">All Categories</option>
+            <option value="Electronics">Electronics</option>
+            <option value="Furniture">Furniture</option>
+            <option value="Office Supplies">Office Supplies</option>
+            <option value="Tools">Tools</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table Section -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden animate-fade-in">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead class="bg-gray-50 dark:bg-gray-700 sticky top-0">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Item Name</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Category</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Stock</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Location</th>
+              <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="inventoryTableBody" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            <!-- Items will be populated here by JavaScript -->
+          </tbody>
+        </table>
+      </div>
+      <!-- Empty State -->
+      <div id="emptyState" class="hidden p-12 text-center">
+        <div class="mx-auto w-32 h-32 text-gray-300 dark:text-gray-500 mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+          </svg>
+        </div>
+        <h3 class="text-lg font-medium text-gray-700 dark:text-gray-300 mb-1">No items found</h3>
+        <p class="text-gray-500 dark:text-gray-400 mb-4">Add your first item to get started</p>
+        <button id="emptyStateAddBtn" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+          + Add Item
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Sample inventory data
+    const inventoryData = [
+      {
+        id: 1,
+        name: "Laptop Pro 15",
+        code: "LP-001",
+        category: "Electronics",
+        stock: 12,
+        status: "Active",
+        location: "Warehouse A",
+        lastUpdated: "2023-05-15"
+      },
+      {
+        id: 2,
+        name: "Wireless Mouse",
+        code: "WM-045",
+        category: "Electronics",
+        stock: 56,
+        status: "Active",
+        location: "Warehouse B",
+        lastUpdated: "2023-06-02"
+      },
+      {
+        id: 3,
+        name: "Office Chair",
+        code: "OC-112",
+        category: "Furniture",
+        stock: 8,
+        status: "Low Stock",
+        location: "Main Office",
+        lastUpdated: "2023-04-28"
+      },
+      {
+        id: 4,
+        name: "Projector X200",
+        code: "PJ-200",
+        category: "Electronics",
+        stock: 3,
+        status: "Active",
+        location: "Meeting Room",
+        lastUpdated: "2023-05-30"
+      },
+      {
+        id: 5,
+        name: "Desk Lamp",
+        code: "DL-078",
+        category: "Office Supplies",
+        stock: 0,
+        status: "Out of Stock",
+        location: "Warehouse A",
+        lastUpdated: "2023-06-10"
+      },
+      {
+        id: 6,
+        name: "Power Drill",
+        code: "PD-901",
+        category: "Tools",
+        stock: 5,
+        status: "Active",
+        location: "Workshop",
+        lastUpdated: "2023-06-05"
+      },
+      {
+        id: 7,
+        name: "Monitor Stand",
+        code: "MS-304",
+        category: "Office Supplies",
+        stock: 2,
+        status: "Damaged",
+        location: "Warehouse B",
+        lastUpdated: "2023-05-22"
+      }
+    ];
+
+    // DOM Elements
+    const inventoryTableBody = document.getElementById('inventoryTableBody');
+    const emptyState = document.getElementById('emptyState');
+    const searchInput = document.getElementById('searchInput');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const addItemBtn = document.getElementById('addItemBtn');
+    const emptyStateAddBtn = document.getElementById('emptyStateAddBtn');
+    const themeToggle = document.getElementById('themeToggle');
+
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', () => {
+      renderInventoryItems(inventoryData);
+      setupEventListeners();
+      checkEmptyState();
+    });
+
+    // Render inventory items
+    function renderInventoryItems(items) {
+      inventoryTableBody.innerHTML = '';
+      
+      if (items.length === 0) {
+        emptyState.classList.remove('hidden');
+        return;
+      }
+      
+      emptyState.classList.add('hidden');
+      
+      items.forEach(item => {
+        const row = document.createElement('tr');
+        row.className = 'hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors';
+        row.innerHTML = `
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="flex items-center">
+              <div class="flex-shrink-0 h-10 w-10 bg-gray-100 dark:bg-gray-600 rounded-md flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                </svg>
+              </div>
+              <div class="ml-4">
+                <div class="text-sm font-medium text-gray-900 dark:text-gray-100">${item.name}</div>
+                <div class="text-sm text-gray-500 dark:text-gray-400">${item.code}</div>
+              </div>
+            </div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${item.category}</td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="text-sm text-gray-900 dark:text-gray-100">${item.stock}</div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+              item.status === 'Active' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+              item.status === 'Low Stock' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
+              item.status === 'Out of Stock' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' :
+              'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+            }">
+              ${item.status}
+            </span>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${item.location}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+            <button class="text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300 mr-3" onclick="handleView(${item.id})">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+            </button>
+            <button class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-3" onclick="handleEdit(${item.id})">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+            </button>
+            <button class="text-purple-600 hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-300" onclick="handleAssign(${item.id})">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+            </button>
+          </td>
+        `;
+        inventoryTableBody.appendChild(row);
+      });
+    }
+
+    // Filter and search functionality
+    function filterItems() {
+      const searchTerm = searchInput.value.toLowerCase();
+      const category = categoryFilter.value;
+      
+      const filteredItems = inventoryData.filter(item => {
+        const matchesSearch = 
+          item.name.toLowerCase().includes(searchTerm) || 
+          item.code.toLowerCase().includes(searchTerm) || 
+          item.location.toLowerCase().includes(searchTerm);
+        
+        const matchesCategory = category === '' || item.category === category;
+        
+        return matchesSearch && matchesCategory;
+      });
+      
+      renderInventoryItems(filteredItems);
+    }
+
+    // Check if table is empty
+    function checkEmptyState() {
+      if (inventoryTableBody.children.length === 0) {
+        emptyState.classList.remove('hidden');
+      } else {
+        emptyState.classList.add('hidden');
+      }
+    }
+
+    // Event handlers
+    function handleView(id) {
+      console.log(`View item with ID: ${id}`);
+      // Implement view functionality
+    }
+
+    function handleEdit(id) {
+      console.log(`Edit item with ID: ${id}`);
+      // Implement edit functionality
+    }
+
+    function handleAssign(id) {
+      console.log(`Assign item with ID: ${id}`);
+      // Implement assign functionality
+    }
+
+    function handleAddItem() {
+      console.log('Add new item');
+      // Implement add item functionality
+    }
+
+    // Setup event listeners
+    function setupEventListeners() {
+      searchInput.addEventListener('input', filterItems);
+      categoryFilter.addEventListener('change', filterItems);
+      addItemBtn.addEventListener('click', handleAddItem);
+      emptyStateAddBtn.addEventListener('click', handleAddItem);
+      
+      // Theme toggle
+      themeToggle.addEventListener('click', () => {
+        if (document.documentElement.classList.contains('dark')) {
+          document.documentElement.classList.remove('dark');
+          localStorage.setItem('theme', 'light');
+        } else {
+          document.documentElement.classList.add('dark');
+          localStorage.setItem('theme', 'dark');
+        }
+      });
+      
+      // Check for saved theme preference
+      if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    }
+
+    // Make functions available globally for button clicks
+    window.handleView = handleView;
+    window.handleEdit = handleEdit;
+    window.handleAssign = handleAssign;
+  </script>
+</body>
+</html>

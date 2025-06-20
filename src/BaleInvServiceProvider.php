@@ -10,7 +10,11 @@ class BaleInvServiceProvider extends PackageServiceProvider
     public function boot()
     {
         $this->publishes([
-            __DIR__.'/../database/migrations' => base_path('database/migrations'),
+            __DIR__.'/../src/App/Jobs' => app_path('Jobs'),
+        ], 'bale-inv-jobs');
+
+        $this->publishes([
+            __DIR__.'/../database/migrations/inv' => base_path('database/migrations/inv'),
         ], 'bale-inv-migrations');
     }
 
