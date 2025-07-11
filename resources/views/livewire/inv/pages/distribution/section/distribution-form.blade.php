@@ -21,7 +21,7 @@ $availableItems = computed(function () {
 });
 
 $availableLocations = computed(function () {
-    return cache()->get('bale_inv_maps', collect());
+    return cache()->get('nawasara_instansi', collect());
 });
 
 rules(
