@@ -1,17 +1,20 @@
 <?php
 
-namespace App\Jobs;
+namespace Paparee\BaleInv\App\Jobs;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
 use Paparee\BaleInv\App\Models\Inventory;
 use Paparee\BaleInv\App\Models\InventoryAssignment;
 use Paparee\BaleInv\App\Models\InventoryMovement;
 
-class GenerateDashboardStatsJob implements ShouldQueue
+class GenerateInvSummaryJob implements ShouldQueue
 {
-    use Queueable;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
      * Create a new job instance.
@@ -36,15 +39,15 @@ class GenerateDashboardStatsJob implements ShouldQueue
             ),
 
             'assignments' => $this->withChange(
-                InventoryAssignment::whereReturnedAt(null)->count(),
-                InventoryAssignment::whereReturnedAt(null)
+                InventoryAssignment::with('movement.inventory')->whereReturnedAt(null)->count(),
+                InventoryAssignment::with('movement.inventory')->whereReturnedAt(null)
                     ->whereMonth('created_at', $lastMonth->month)
                     ->count()
             ),
 
             'damaged_missing' => $this->withChange(
-                InventoryAssignment::whereReturnCondition('damaged')->orWhere('status', 'missing')->count(),
-                InventoryAssignment::whereReturnCondition('damaged')->orWhere('status', 'missing')
+                InventoryAssignment::with('movement.inventory')->whereReturnCondition('damaged')->orWhere('status', 'missing')->count(),
+                InventoryAssignment::with('movement.inventory')->whereReturnCondition('damaged')->orWhere('status', 'missing')
                     ->whereMonth('created_at', $lastMonth->month)
                     ->count()
             ),
@@ -60,7 +63,7 @@ class GenerateDashboardStatsJob implements ShouldQueue
             ),
         ];
 
-        Cache::put('bale_cache_inv.dashboard_summary', $stats, now()->addMinutes(15));
+        Cache::put('inv_summary', $stats);
     }
 
     protected function withChange(int $thisMonth, int $lastMonth): array

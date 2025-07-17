@@ -2,17 +2,27 @@
 
 namespace Paparee\BaleInv;
 
+use Paparee\BaleInv\Commands\UpdateInvMigrationsCommand;
+use Paparee\BaleInv\Commands\UpdateViewCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
 class BaleInvServiceProvider extends PackageServiceProvider
 {
+
+    public function register()
+    {
+        $this->app->bind('command.bale-inv:update-view', UpdateViewCommand::class);
+        $this->app->bind('command.bale-inv:update-migration', UpdateInvMigrationsCommand::class);
+        
+        $this->commands([
+            'command.bale-inv:update-view',
+            'command.bale-inv:update-migration',
+        ]);
+    }
+
     public function boot()
     {
-        $this->publishes([
-            __DIR__.'/../src/App/Jobs' => app_path('Jobs'),
-        ], 'bale-inv-jobs');
-
         $this->publishes([
             __DIR__.'/../database/migrations/inv' => base_path('database/migrations/inv'),
         ], 'bale-inv-migrations');

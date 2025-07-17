@@ -15,13 +15,11 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->uuid('inventory_assignment_id');
             $table->string('item_name_alias')->nullable();
-            $table->string('device_type')->nullable()->comment('Router, Access Point, Printer, Computer, Switch');
             $table->string('model')->nullable();
             $table->string('serial_number')->nullable();
             $table->ipAddress('ip_address')->nullable();
             $table->macAddress('mac_address')->nullable();
             $table->string('brand')->nullable();
-            $table->jsonb('specification')->nullable();
             $table->enum('license_type', ['lifetime', 'subscription'])->nullable();
             $table->date('purchase_date')->nullable();
             $table->date('expiration_date')->nullable();

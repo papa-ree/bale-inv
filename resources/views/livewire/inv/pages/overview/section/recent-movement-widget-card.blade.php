@@ -8,11 +8,11 @@ $activities = computed(function () {
     return InventoryMovement::orderByDesc('created_at')->limit(5)->get();
 });
 
-placeholder('<div class="w-full max-w-sm p-6 mx-auto bg-white shadow rounded-2xl dark:bg-gray-800">
+placeholder('<div class="w-full p-6 mx-auto bg-white shadow animate-pulse rounded-2xl dark:bg-gray-800">
   <h2 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white">Recent Stock Movement Activity</h2>
 
   <!-- Skeleton items -->
-  <div class="space-y-4 animate-pulse">
+  <div class="space-y-4">
     <!-- Item skeleton -->
     <div class="flex space-x-4">
       <div class="w-10 h-10 bg-gray-300 rounded-full dark:bg-gray-700"></div>

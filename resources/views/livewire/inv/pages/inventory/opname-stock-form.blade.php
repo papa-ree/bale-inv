@@ -2,22 +2,22 @@
 
 use function Livewire\Volt\{title, mount, computed, state, rules};
 use Illuminate\Support\Facades\DB;
-use Paparee\BaleInv\App\Models\InventoryItem;
+use Paparee\BaleInv\App\Models\Inventory;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 
-state(['inventory_item_name', 'stock', 'note']);
+state(['item_name', 'stock', 'note']);
 title('INV | Opname Stock');
 
 rules(
     fn() => [
-        'inventory_item_name' => 'required|string',
+        'item_name' => 'required|string',
         'stock' => 'required|integer',
         'note' => 'required|string',
     ],
 );
 
 $availableItems = computed(function () {
-    return InventoryItem::get();
+    return Inventory::get();
 });
 
 $store = function (LivewireAlert $alert) {
@@ -30,16 +30,18 @@ $store = function (LivewireAlert $alert) {
     try {
         $this->dispatch('disabling-button', params: true);
 
-        $item = InventoryItem::whereInventoryItemName($this->inventory_item_name)->first();
+        $item = Inventory::whereItemName($this->item_name)->first();
 
         $item->setStock($this->stock, $this->note);
 
+        $this->dispatch('refresh-inventory-list');
+
         DB::commit();
         session()->flash('saved', [
-            'title' => 'Stock Added',
+            'title' => 'Stock Set!',
         ]);
 
-        $this->redirect('items', navigate: true);
+        $this->redirect('inventories', navigate: true);
     } catch (\Throwable $th) {
         $this->dispatch('disabling-button', params: false);
 
@@ -59,25 +61,22 @@ $store = function (LivewireAlert $alert) {
         </div>
         <form wire:submit='store' class="mt-8">
             <div class="mb-4">
-                <x-bale.select-dropdown label="select Item" x-data="{ itemName: $wire.entangle('inventory_item_name') }">
+                <x-bale.select-dropdown label="select Item" x-data="{ itemName: $wire.entangle('item_name') }">
                     <x-slot name="defaultValue">
                         <span x-text="itemName == null ? 'Open this select menu' : itemName"></span>
                     </x-slot>
                     @foreach ($this->availableItems as $item)
                         <label for="{{ $item->id }}"
                             class="flex w-full p-3 text-sm transition duration-200 ease-out bg-white hover:bg-gray-200 hover:rounded-lg dark:bg-neutral-900 hover:dark:border-neutral-700 dark:text-neutral-400"
-                            wire:key="{{ $item->inventory_item_name }}"
-                            @click="title='{{ $item->inventory_item_name }}'">
-                            <span
-                                class="text-sm text-gray-500 dark:text-neutral-400">{{ $item->inventory_item_name }}</span>
-                            <input type="radio" name="inventory_item_name" wire:model='inventory_item_name'
-                                value="{{ $item->inventory_item_name }}"
+                            wire:key="{{ $item->item_name }}" @click="title='{{ $item->item_name }}'">
+                            <span class="text-sm text-gray-500 dark:text-neutral-400">{{ $item->item_name }}</span>
+                            <input type="radio" name="item_name" wire:model='item_name' value="{{ $item->item_name }}"
                                 class="shrink-0 ms-auto mt-0.5 border-gray-200 rounded-full text-blue-600 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800"
                                 id="{{ $item->id }}">
                         </label>
                     @endforeach
                 </x-bale.select-dropdown>
-                <x-input-error for="inventory_item_name" />
+                <x-input-error for="item_name" />
             </div>
 
             <div class="mb-4">

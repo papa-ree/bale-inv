@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Auth;
 
 class InventoryAssignment extends Model
 {
@@ -19,8 +20,10 @@ class InventoryAssignment extends Model
     {
         static::creating(function ($inventory_assignment) {
             $inventory_assignment->inv_code = date('Y') . '-' . uniqid();
+            $inventory_assignment->user_uuid = Auth::user()->uuid;
         });
     }
+
     
     public static function conditions()
     {
@@ -55,6 +58,7 @@ class InventoryAssignment extends Model
     {
         return Attribute::make(
             get: fn ($value) => $value ? json_decode($value) : '-',
+            set: fn ($value) => $value ? json_encode($value) : '-',
         );
     }
     
@@ -62,6 +66,7 @@ class InventoryAssignment extends Model
     {
         return Attribute::make(
             get: fn ($value) => $value ? json_decode($value) : '-',
+            set: fn ($value) => $value ? json_encode($value) : '-',
         );
     }
     
@@ -81,12 +86,12 @@ class InventoryAssignment extends Model
 
     public function getItemNameAttribute()
     {
-        return $this->movement->inventory->inventoryable->inventory_item_name ?? null;
+        return $this->movement->inventory->item_name ?? null;
     }
 
     public function getItemDataAttribute()
     {
-        return $this->movement->inventory->inventoryable ?? null;
+        return $this->movement->inventory ?? null;
     }
 
     public function assignLog(): HasMany
@@ -94,7 +99,6 @@ class InventoryAssignment extends Model
         return $this->hasMany(InventoryAssignmentLog::class);
     }
 
-    
     public function getUserAttribute()
     {
         return app('App\Models\User')::on('mysql')->where('uuid', $this->user_uuid)->first();

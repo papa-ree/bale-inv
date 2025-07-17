@@ -67,6 +67,8 @@ $return = function (LivewireAlert $alert) {
 
         DB::commit();
 
+        $this->dispatch('refresh-inventory-list');
+
         session()->flash('saved', [
             'title' => 'Item Returned',
         ]);
@@ -138,7 +140,9 @@ $return = function (LivewireAlert $alert) {
                 <x-input-error for="note" />
             </div>
 
-            <x-bale.button label="assign" type="submit" />
+            <x-bale.modal-action>
+                <x-bale.button label="assign" type="submit" />
+            </x-bale.modal-action>
         </form>
     </x-bale.page-container>
 </div>

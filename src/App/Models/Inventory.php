@@ -6,24 +6,54 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Paparee\BaleInv\App\Traits\HasInventory;
 
 class Inventory extends Model
 {
     use HasUuids;
-
+    
     protected $guarded = ['id'];
     protected $connection = 'inv';
-    protected $primaryKey = 'id';
-    public $incrementing = false;
 
-    public function inventoryable()
+    public static function category()
     {
-        return $this->morphTo();
+        $category = collect([
+            ['name' => 'hardware'],
+            ['name' => 'software'],
+            ['name' => 'other'],
+        ]);
+
+        return $category;
     }
 
     public function movements()
     {
         return $this->hasMany(InventoryMovement::class);
+    }
+
+    public function setStock(int $quantity, ?string $note = null)
+    {
+        return $this->opname($quantity, $note);
+    }
+
+    public function distributeStock(int $quantity, $contact_location = null, $assign_contact = null, string $condition, $status = null, ?string $note = null)
+    {
+        return $this->distribute($quantity, $contact_location, $assign_contact, $condition, $status, $note);
+    }
+
+    public function increaseStock(int $quantity, ?string $note = null)
+    {
+        return $this->adjust($quantity, 'in', $note);
+    }
+
+    public function decreaseStock(int $quantity, ?string $note = null)
+    {
+        return $this->adjust($quantity, 'out', $note);
+    }
+
+    public function returnItem(?string $note = null)
+    {
+        return $this->return($note);
     }
 
     public function adjust(int $quantity, string $direction, ?string $note = null)
@@ -55,7 +85,6 @@ class Inventory extends Model
             'direction' => $diff > 0 ? 'in' : 'out',
             'quantity' => abs($diff),
             'note' => $note ?? "Stock opname to {$targetQuantity}",
-            'user_uuid' => Auth::user()->uuid,
         ]);
 
         $this->stock = $targetQuantity;
@@ -72,7 +101,6 @@ class Inventory extends Model
                 'direction' => 'out',
                 'quantity' => $quantity,
                 'note' => $note ?? 'distributed',
-                'user_uuid' => Auth::user()->uuid,
             ]);
 
             $this->stock += -$quantity;
@@ -95,9 +123,9 @@ class Inventory extends Model
     {
         $assign = InventoryAssignment::create([
             'inventory_movement_id' => $id,
-            'contact_location' => json_encode($contact_location),
+            'contact_location' => $contact_location,
             'type' => 'distribution',
-            'assign_contact' => json_encode($assign_contact),
+            'assign_contact' => $assign_contact,
             'assign_condition' => $assign_condition,
             'assigned_at' => now(),
             'status' => $status,
@@ -138,7 +166,6 @@ class Inventory extends Model
                 'direction' => 'in',
                 'quantity' => 1,
                 'note' => $note ?? 'returned',
-                'user_uuid' => Auth::user()->uuid,
             ]);
 
             $this->stock += 1;

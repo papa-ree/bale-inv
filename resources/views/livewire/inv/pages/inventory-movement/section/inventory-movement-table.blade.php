@@ -23,17 +23,15 @@ $availableMoving = computed(function () {
 
     return InventoryMovement::query()
         ->whereHas('inventory', function ($q) use ($searchTerm) {
-            $q->where('inventoryable_type', InventoryItem::class)->whereHasMorph('inventoryable', InventoryItem::class, function ($q2) use ($searchTerm) {
-                $q2->where('inventory_item_name', 'like', '%' . $searchTerm . '%');
-            });
+            $q->where('item_name', 'like', '%' . $searchTerm . '%');
         })
-        ->with('inventory.inventoryable')
+        ->with('inventory')
         ->orderByDesc('created_at')
         ->paginate(20);
 });
 
 on([
-    'refresh-inventory-item-list' => function () {
+    'refresh-inventory-list' => function () {
         return $this->availableMoving;
     },
 ]);
@@ -90,17 +88,16 @@ on([
                         </span>
                     </div>
                 </th>
-                <th scope="col"
-                    class="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sm:table-cell">
+                <th scope="col" class=" px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                     <div class="flex items-center gap-x-2">
                         <span class="text-xs font-semibold tracking-wide text-gray-800 uppercase dark:text-gray-200">
                             {{ __('Notes') }}
                         </span>
                     </div>
                 </th>
-                <th scope="col" class="relative py-3.5 pl-3 pr-4">
+                {{-- <th scope="col" class="relative py-3.5 pl-3 pr-4">
                     <span class="sr-only">Edit</span>
-                </th>
+                </th> --}}
             </tr>
         </x-slot>
 
@@ -119,7 +116,7 @@ on([
                             <dt class="sr-only">Item Name</dt>
                             <dd class="mt-1 text-gray-700 truncate">
                                 <span class="block text-xs text-gray-500 dark:text-gray-200">
-                                    {{ $item->item_name }}
+                                    {{ $item->inventory->item_name }}
                                 </span>
                             </dd>
                             <dt class="sr-only">Item Name</dt>
@@ -144,7 +141,7 @@ on([
                     </td>
 
                     <td class="hidden px-3 py-4 text-sm text-gray-500 lg:table-cell">
-                        {{ $item->item_name }}
+                        {{ $item->inventory->item_name }}
                     </td>
 
                     <td class="hidden px-3 py-4 text-sm text-gray-500 lg:table-cell">
@@ -169,12 +166,12 @@ on([
                         <span class="block text-sm text-gray-500">{{ $item->user->name ?? '-' }}</span>
                     </td>
 
-                    <td class="hidden px-3 py-4 text-sm text-gray-500 sm:table-cell">
-                        <span class="block text-sm text-gray-500">{{ $item->notes }}</span>
+                    <td class="px-3 py-4 text-sm text-gray-500">
+                        <span class="block text-sm text-gray-500">{{ $item->note }}</span>
                     </td>
 
-                    <td class="py-4 pl-3 pr-4 text-sm font-medium text-right ">
-                        <div class="hs-dropdown relative inline-block [--placement:bottom|left]">
+                    {{-- <td class="py-4 pl-3 pr-4 text-sm font-medium text-right "> --}}
+                    {{-- <div class="hs-dropdown relative inline-block [--placement:bottom|left]">
                             <button id="hs-table-dropdown-{{ $item->id }}" type="button"
                                 class="hs-dropdown-toggle py-1.5 px-2 inline-flex justify-center items-center gap-2 rounded-lg text-gray-700 align-middle disabled:opacity-50 disabled:pointer-events-none focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-emerald-300 transition-all text-sm dark:text-neutral-400 dark:hover:text-white dark:focus:ring-offset-gray-800">
                                 <svg class="flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24"
@@ -195,16 +192,9 @@ on([
                                     </button>
 
                                 </div>
-
-                                {{-- <div class="py-2 first:pt-0 last:pb-0">
-                                    <button @click="openPermissionDeleteModal"
-                                        class="flex items-center w-full px-3 py-2 text-sm text-red-600 rounded-lg gap-x-3 hover:bg-gray-100 focus:ring-2 focus:ring-emerald-500 dark:text-red-500 dark:hover:bg-neutral-700">
-                                        Delete
-                                    </button>
-                                </div> --}}
                             </div>
-                        </div>
-                    </td>
+                        </div> --}}
+                    {{-- </td> --}}
                 </tr>
             @endforeach
         </x-slot>

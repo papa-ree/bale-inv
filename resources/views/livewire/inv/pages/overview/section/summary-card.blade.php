@@ -3,7 +3,7 @@
 use function Livewire\Volt\{computed, placeholder};
 
 $stats = computed(function () {
-    return cache()->get('bale_cache_inv.dashboard_summary') ?? [];
+    return cache()->get('inv_summary') ?? [];
 });
 
 $totalItem = computed(function () {
@@ -150,8 +150,10 @@ placeholder('<div class="grid grid-cols-1 gap-6 mb-8 md:grid-cols-2 lg:grid-cols
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Stock Movement</p>
-                        <h3 class="mt-1 text-2xl font-bold">+{{ $this->movementIn['value'] }} /
-                            -{{ $this->movementOut['value'] }}</h3>
+                        <h3 class="mt-1 text-2xl font-bold">
+                            <span class="text-emerald-400">+{{ $this->movementIn['value'] }}</span> /
+                            <span class="text-red-400">-{{ $this->movementOut['value'] }}</span>
+                        </h3>
                     </div>
                     <div class="p-3 rounded-lg bg-blue-50 dark:bg-blue-900/30">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-blue-500" fill="none"
@@ -162,7 +164,8 @@ placeholder('<div class="grid grid-cols-1 gap-6 mb-8 md:grid-cols-2 lg:grid-cols
                     </div>
                 </div>
                 <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">
-                    <span class="font-medium text-green-500">+In / -Out</span>
+                    <span class="font-medium"><span class="text-emerald-400">+In</span> / <span
+                            class="text-red-400">-Out</span></span>
                 </p>
             </div>
         @endif

@@ -16,19 +16,29 @@ mount(function () {
 <div>
     <div class="min-h-screen">
 
-        <!-- Main Content -->
-        <main class="px-4 py-6 mx-auto sm:px-6 lg:px-8">
-            <!-- Page Title -->
+        {{-- <!-- Main Content --> --}}
+        <main class="mx-auto">
+            {{-- <!-- Page Title --> --}}
             <div class="flex items-center justify-between mb-6">
                 <h2 class="text-2xl font-bold">{{ __('Inventory Overview') }}</h2>
-                <div class="flex space-x-2">
-                    <x-bale.button label="Add Item" type="button" link href="{{ route('items.create', 'new') }}" />
+                <div class="flex space-x-2" x-data="{
+                    openDistributeItemModal() {
+                        $wire.dispatch('openBaleModal', { id: 'distributeItemModal' });
+                    },
+                }">
+                    <x-bale.secondary-button label="Opname Stock" type="button" link
+                        href="{{ route('inventories.opname-stock') }}" />
+                    <x-bale.secondary-button label="Add Stock" type="button" link
+                        href="{{ route('inventories.add-stock') }}" />
+
+                    <x-bale.secondary-button label="Distribute Item" type="button" @click="openDistributeItemModal" />
+                    <x-bale.button label="Add Master Item" type="button" link
+                        href="{{ route('master-items.create', 'new') }}" />
                 </div>
             </div>
 
             {{-- <!-- Summary Cards --> --}}
             <livewire:inv.pages.overview.section.summary-card lazy="on-load" />
-
 
             {{-- <!-- Charts Section -->
             <div class="grid grid-cols-1 gap-6 mb-8 lg:grid-cols-3">
@@ -43,7 +53,7 @@ mount(function () {
             <!-- Bottom Section -->
             <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
                 <!-- Recent Movement Activity -->
-                <livewire:inv.pages.overview.section.recent-activity-widget-card lazy="on-load" />
+                <livewire:inv.pages.overview.section.recent-movement-widget-card lazy="on-load" />
                 {{-- recent assignment --}}
                 <livewire:inv.pages.overview.section.recent-assign-widget-card lazy="on-load" />
 
@@ -177,4 +187,9 @@ mount(function () {
             </div>
         </main>
     </div>
+
+    {{-- distribution form modal --}}
+    <x-bale.modal modalId="distributeItemModal" size="xl" staticBackdrop>
+        <livewire:inv.pages.distribution.modal.distribution-form-modal />
+    </x-bale.modal>
 </div>

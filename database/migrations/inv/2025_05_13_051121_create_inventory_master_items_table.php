@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::connection('inv')->create('inventories', function (Blueprint $table) {
+        Schema::connection('inv')->create('inventory_master_items', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('item_name')->unique();
             $table->string('item_type')->comment('set hardware or software');
@@ -21,11 +21,8 @@ return new class extends Migration
             $table->text('specification')->nullable();
             $table->string('item_device_type')->comment('router, switch, computer, etc')->nullable();
             $table->string('item_license_purpose')->comment('networking, software, computer, etc')->nullable();
-            $table->integer('stock')->default(0); // stok saat ini
-            $table->string('unit'); // unit
             $table->timestamps();
         });
-
     }
 
     /**
@@ -33,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::connection('inv')->dropIfExists('inventories');
+        Schema::connection('inv')->dropIfExists('inventory_master_items');
     }
 };
