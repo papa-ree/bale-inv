@@ -3,7 +3,7 @@
 namespace Paparee\BaleInv;
 
 use Paparee\BaleInv\Commands\UpdateInvMigrationsCommand;
-use Paparee\BaleInv\Commands\UpdateInvViewCommand;
+use Paparee\BaleInv\Commands\UpdateInvViewsCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -12,7 +12,7 @@ class BaleInvServiceProvider extends PackageServiceProvider
 
     public function register()
     {
-        $this->app->bind('command.bale-inv:update-view', UpdateInvViewCommand::class);
+        $this->app->bind('command.bale-inv:update-view', UpdateInvViewsCommand::class);
         $this->app->bind('command.bale-inv:update-migration', UpdateInvMigrationsCommand::class);
         
         $this->commands([
