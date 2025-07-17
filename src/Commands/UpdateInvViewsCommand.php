@@ -6,7 +6,7 @@ use Illuminate\Console\Command;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'bale-inv:update-view', hidden: true)]
-class UpdateViewCommand extends Command
+class UpdateInvViewCommand extends Command
 {
     protected $signature = 'bale-inv:update-view';
     protected $description = 'Force update bale-inv views from vendor';
