@@ -26,17 +26,22 @@ new class extends Component {
             $this->delete();
             DB::commit();
 
-            session()->flash('saved', [
-                'title' => 'Device Type Deleted!',
+            session()->flash("saved", [
+                "title" => "Device Type Deleted!",
             ]);
 
-            $this->redirect('device-types', navigate: true);
+            $this->redirect("device-types", navigate: true);
         } catch (\Throwable $th) {
-            $this->dispatch('message-failed');
+            $this->dispatch("message-failed");
             DB::rollBack();
             info($th->getMessage());
 
-            $alert->title('Something wrong!')->position('top-end')->error()->toast()->show();
+            $alert
+                ->title("Something wrong!")
+                ->position("top-end")
+                ->error()
+                ->toast()
+                ->show();
         }
     }
 
@@ -48,50 +53,51 @@ new class extends Component {
 };
 ?>
 
-<div x-data="{
-    deviceTypeId: '',
-    deviceTypeName: '',
-    init() {
-        this.resetState();
-    },
-    resetState() {
-        this.deviceTypeId = '';
-        this.deviceTypeName = '';
-    },
-    handleDeviceTYpeData(detail) {
-        this.deviceTypeId = detail.deviceTypeId;
-        this.deviceTypeName = detail.deviceTypeName;
-    },
-}" x-init="init()" @device-data.window="handleDeviceTYpeData($event.detail)">
-
+<div
+    x-data="{
+        deviceTypeId: '',
+        deviceTypeName: '',
+        init() {
+            this.resetState()
+        },
+        resetState() {
+            this.deviceTypeId = ''
+            this.deviceTypeName = ''
+        },
+        handleDeviceTYpeData(detail) {
+            this.deviceTypeId = detail.deviceTypeId
+            this.deviceTypeName = detail.deviceTypeName
+        },
+    }"
+    x-init="init()"
+    @device-data.window="handleDeviceTYpeData($event.detail)"
+>
     <div class="sm:flex sm:items-start">
-        <div
-            class="flex items-center justify-center flex-shrink-0 w-12 h-12 mx-auto bg-red-100 rounded-full sm:mx-0 sm:h-10 sm:w-10">
-            <svg class="w-6 h-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+        <div class="flex items-center justify-center flex-shrink-0 w-12 h-12 mx-auto bg-red-100 rounded-full sm:mx-0 sm:h-10 sm:w-10">
+            <svg class="w-6 h-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
+                />
             </svg>
         </div>
         <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
             <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white" id="modal-title">
-                Delete <span x-text="deviceTypeName"></span> ?
+                Delete
+                <span x-text="deviceTypeName"></span>
+                ?
             </h3>
             <div class="mt-2">
                 <p class="text-sm text-gray-500 dark:text-white">
-                    Are you sure you want to delete
-                    this item? All
-                    of your data will be permanently removed
-                    from our servers forever. This action cannot be undone.
+                    Are you sure you want to delete this item? All of your data will be permanently removed from our servers forever. This action cannot be undone.
                 </p>
             </div>
         </div>
     </div>
 
     <x-bale.modal-action>
-        <x-bale.secondary-button label="Cancel"
-            wire:click="$dispatch('closeBaleModal', { id: 'deviceTypeDeleteModal' })" class="ml-3" />
+        <x-bale.secondary-button label="Cancel" wire:click="$dispatch('closeBaleModal', { id: 'deviceTypeDeleteModal' })" class="ml-3" />
         <x-bale.danger-button label="Gaskeun!" @click="$wire.deleteDevice(deviceTypeId); useSpinner()" />
     </x-bale.modal-action>
-
 </div>
