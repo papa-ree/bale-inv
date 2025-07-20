@@ -5,10 +5,10 @@ namespace Paparee\BaleInv\Commands;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Attribute\AsCommand;
 
-#[AsCommand(name: 'bale-inv:update', hidden: true)]
+#[AsCommand(name: 'inv:update', hidden: true)]
 class UpdateInvCommand extends Command
 {
-    protected $signature = 'bale-inv:update';
+    protected $signature = 'inv:update';
     protected $description = 'Force update bale-inv from vendor';
 
     public function handle()

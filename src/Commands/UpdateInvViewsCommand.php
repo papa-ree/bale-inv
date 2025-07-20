@@ -5,10 +5,10 @@ namespace Paparee\BaleInv\Commands;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Attribute\AsCommand;
 
-#[AsCommand(name: 'bale-inv:update-view', hidden: true)]
+#[AsCommand(name: 'inv:update-view', hidden: true)]
 class UpdateInvViewsCommand extends Command
 {
-    protected $signature = 'bale-inv:update-view';
+    protected $signature = 'inv:update-view';
     protected $description = 'Force update bale-inv views from vendor';
 
     public function handle()
